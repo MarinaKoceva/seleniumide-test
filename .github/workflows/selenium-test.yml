@@ -1,4 +1,4 @@
-name: Selenium UI Test on .NET 6
+name: build-and-test
 
 on:
   push:
@@ -7,11 +7,11 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build-and-test:
+  build:
     runs-on: windows-latest
 
     steps:
-    - name: Checkout repository
+    - name: Checkout source code
       uses: actions/checkout@v3
 
     - name: Setup .NET 6 SDK
@@ -19,16 +19,19 @@ jobs:
       with:
         dotnet-version: 6.0.x
 
-    - name: Restore dependencies
-      run: dotnet restore
+    - name: Restore NuGet packages
+      run: dotnet restore SeleniumIde.sln
+      working-directory: 2-SeleniumIDE/SeleniumIDE
 
     - name: Build solution
-      run: dotnet build --configuration Debug --no-restore
+      run: dotnet build SeleniumIde.sln --configuration Debug --no-restore
+      working-directory: 2-SeleniumIDE/SeleniumIDE
 
-    - name: Download matching ChromeDriver
-      run: |
-        choco install chromedriver --version=137.0.7151.70 -y
-        echo "CHROMEDRIVER path: $env:ProgramData\chocolatey\bin" >> $env:GITHUB_PATH
+    - name: Install ChromeDriver v137 (match local)
+      uses: nanasess/setup-chromedriver@v2
+      with:
+        chromedriver-version: '137.0.7151.70'
 
-    - name: Run UI tests
-      run: dotnet test --no-build
+    - name: Run Selenium Tests
+      run: dotnet test SeleniumIde.sln --no-build --verbosity normal
+      working-directory: 2-SeleniumIDE/SeleniumIDE
