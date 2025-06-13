@@ -31,10 +31,10 @@ jobs:
 
     - name: Install ChromeDriver v137 (match local)
       run: |
-        mkdir drivers
-        curl -L -o chrome.zip https://storage.googleapis.com/chrome-for-testing-public/137.0.7151.70/win64/chromedriver-win64.zip
-        tar -xf chrome.zip -C drivers
-        mv drivers/chromedriver-win64/chromedriver.exe drivers/chromedriver.exe
+    if (-Not (Test-Path "drivers")) { New-Item -ItemType Directory -Path "drivers" }
+    Invoke-WebRequest https://storage.googleapis.com/chrome-for-testing-public/137.0.7151.70/win64/chromedriver-win64.zip -OutFile drivers\chromedriver.zip
+    Expand-Archive drivers\chromedriver.zip -DestinationPath drivers
+    Remove-Item drivers\chromedriver.zip
 
     - name: Run Selenium Tests
       run: dotnet test --no-build --verbosity normal
