@@ -1,4 +1,4 @@
-name: Selenium UI Test on .NET 6
+name: Selenium IDE CI
 
 on:
   push:
@@ -7,34 +7,30 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build-and-test:
-    runs-on: windows-latest
-
-    defaults:
-      run:
-        working-directory: SeleniumIDE
+  build:
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout source code
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Setup .NET 6 SDK
+      - name: Set up .NET Core
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '6.0.x'
 
-      - name: Restore NuGet packages
+      - name: Install Chrome
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y google-chrome-stable
+
+      - name: Install dependencies
         run: dotnet restore
 
-      - name: Build solution
+      - name: Build
         run: dotnet build --no-restore
 
-      - name: Install ChromeDriver v137 (match local)
-        run: |
-          if (-Not (Test-Path "drivers")) { New-Item -ItemType Directory -Path "drivers" }
-          Invoke-WebRequest https://storage.googleapis.com/chrome-for-testing-public/137.0.7151.70/win64/chromedriver-win64.zip -OutFile drivers\chromedriver.zip
-          Expand-Archive drivers\chromedriver.zip -DestinationPath drivers
-          Remove-Item drivers\chromedriver.zip
-
-      - name: Run Selenium Tests
-        run: dotnet test --no-build --verbosity normal
+      - name: Run tests
+        env:
+          CHROMEWEBDRIVER: /usr/bin/google-chrome
+        run: dotnet test --verbosity normal
