@@ -12,7 +12,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: 2-SeleniumIDE/SeleniumIde
+        working-directory: SeleniumIDE
 
     steps:
     - name: Checkout source code
@@ -31,9 +31,10 @@ jobs:
 
     - name: Install ChromeDriver v137 (match local)
       run: |
-        mkdir -p drivers
-        curl -L -o drivers/chromedriver.exe https://storage.googleapis.com/chrome-for-testing-public/137.0.7151.70/win64/chromedriver-win64.zip
-        tar -xf drivers/chromedriver.exe -C drivers
+        mkdir drivers
+        curl -L -o chrome.zip https://storage.googleapis.com/chrome-for-testing-public/137.0.7151.70/win64/chromedriver-win64.zip
+        tar -xf chrome.zip -C drivers
+        mv drivers/chromedriver-win64/chromedriver.exe drivers/chromedriver.exe
 
     - name: Run Selenium Tests
       run: dotnet test --no-build --verbosity normal
