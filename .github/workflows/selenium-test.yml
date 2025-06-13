@@ -34,3 +34,9 @@ jobs:
       env:
         CHROMEWEBDRIVER: /usr/bin/google-chrome
       run: dotnet test --verbosity normal
+    
+    - name: Install Chrome & ChromeDriver
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y google-chrome-stable chromium-chromedriver
+        echo "Installed Chrome & ChromeDriver"
